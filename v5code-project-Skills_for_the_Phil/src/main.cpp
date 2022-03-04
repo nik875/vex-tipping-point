@@ -19,7 +19,11 @@
 // Conveyor             motor         16              
 // Controller1          controller                    
 // Controller2          controller                    
-// Drivetrain           drivetrain    18, 5, 10, 2, 9 
+// Inertial             inertial      9               
+// LB                   motor         18              
+// LF                   motor         5               
+// RB                   motor         10              
+// RF                   motor         2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
  
 #include "vex.h"
@@ -29,10 +33,16 @@ using namespace vex;
  
 // A global instance of competition
 competition Competition;
- 
+
+// Drivetrain           drivetrain    18, 5, 10, 2, 9 
+
 // define your global instances of motors and other devices here
+motor_group leftDrive(LB, LF);
+motor_group rightDrive(RB, RF);
+smartdrive Drivetrain(leftDrive, rightDrive, Inertial, 4 * 3.14, 15.5, 10.5, inches, 1);
 double ROBOTCIRCUMFRENCE = 58.12;
 double DEGREESPERINCH = 360 / 12.56;
+// drivetrain *Drivetrain = new drivetrain(LeftDrive, RightDrive, 4 * 3.14);
 int team = 0;
 static double xPos = 11;
 static double yPos = 1;
@@ -41,7 +51,8 @@ void pre_auton(void)
 {
  // I0nitializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  Drivetrain.setStopping(brake);
+  // Drivetrain -> setStopping(brake);
+  // Drivetrain.setStopping(brake);
  Brain.Screen.setFont(propXXL);
  Brain.Screen.setCursor(1,2); 
  Brain.Screen.setFillColor(transparent);
@@ -55,7 +66,6 @@ void pre_auton(void)
  Brain.Screen.setPenColor(white);
  Brain.Screen.print("ROBORAYS1");
 }
-
 
 void bringBackClampDown()
 {
@@ -82,21 +92,27 @@ int stopDistance(int vel, int acc, int INTERVAL, int stopThresh) {
   return d;
 }
 
-void move(double inches, int travelVel = 200, int acc = 10, int dec = 10, int stopThresh = 20) {
-  int pos = 0; int INTERVAL = 100;
-  for (int vel = 0; inches - pos > stopDistance(vel, dec, INTERVAL, stopThresh); vel += (vel + acc <= travelVel) ? vel + acc : travelVel) {
-    Drivetrain.drive(forward, vel, rpm);
+void correctedDrive(int vel, int rightLead, int INTERVAL) {
+    leftDrive.spin(forward, vel + (rightLead / 360 * 60), rpm);
+    rightDrive.spin(forward, vel, rpm);
     wait(INTERVAL, seconds);
+}
+
+void move(double distInches, int travelVel = 190, int acc = 10, int dec = 10, int stopThresh = 20) {
+  int pos = 0; double INTERVAL = .01;
+  for (int vel = 0; distInches - pos > stopDistance(vel, dec, INTERVAL, stopThresh); vel += (vel + acc <= travelVel) ? vel + acc : travelVel) {
+    correctedDrive(vel, rightDrive.position(degrees) - leftDrive.position(degrees), INTERVAL);
+    pos += Drivetrain.velocity(rpm) / 60 * 4 * 3.14 * INTERVAL;
   }
-  while (Drivetrain.velocity(rpm) > stopThresh) {
-    Drivetrain.drive(forward, Drivetrain.velocity(rpm) - dec, rpm);
-    wait(INTERVAL, seconds);
-  }
+  while (Drivetrain.velocity(rpm) > stopThresh)
+    correctedDrive(Drivetrain.velocity(rpm) - dec, rightDrive.position(degrees) - leftDrive.position(degrees), INTERVAL);
   Drivetrain.stop(brake);
 }
 //red bottom autonomous/Blue Top
 void autonomous(void) {
-  wait(1, seconds);
+  Inertial.calibrate();
+  while (Inertial.isCalibrating())
+    wait(.01, seconds);
   Drivetrain.setDriveVelocity(50,rpm);
   FourBar.setVelocity(100, rpm);
   Drivetrain.driveFor(reverse, 12, inches);
