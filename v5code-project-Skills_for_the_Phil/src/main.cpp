@@ -9,7 +9,7 @@
 /*    Description:  Competition Template                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- 
+
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
@@ -91,7 +91,8 @@ wait(1, seconds);
   Drivetrain.setDriveVelocity(50,rpm);
   FourBar.setVelocity(100, rpm);
   Drivetrain.driveFor(reverse, 12, inches);
-  BackClamp.spinFor(forward, 2100, degrees, 200, velocityUnits::rpm);
+  BackClamp.spinFor(forward, 2290, degrees, 200, velocityUnits::rpm);
+  Conveyor.spin(forward, 300, velocityUnits::rpm);
   Drivetrain.turnToHeading(85, degrees);
   Drivetrain.driveFor(forward, 24, inches);
   Drivetrain.turnToHeading(173, degrees);
@@ -117,13 +118,13 @@ wait(1, seconds);
   FourBar.spinFor(540, degrees);
   Drivetrain.turnToHeading(355, degrees);
   Drivetrain.driveFor(reverse, -56, inches, 100, velocityUnits::rpm);
-  Drivetrain.turnToHeading(119, degrees);
+  Drivetrain.turnToHeading(125, degrees);
   Drivetrain.driveFor(reverse, -36, inches, 100, velocityUnits::rpm);
   Clamp.spin(forward);
   wait(1, seconds);
   Drivetrain.turnToHeading(160, degrees);
   Drivetrain.driveFor(reverse, -36, inches, 200, velocityUnits::rpm);
-
+  Clamp.spinFor(reverse,100,degrees);
 
 
 
