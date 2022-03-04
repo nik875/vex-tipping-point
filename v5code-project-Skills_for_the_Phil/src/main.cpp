@@ -90,6 +90,7 @@ void move(double inches, int travelVel = 200, int acc = 10, int dec = 10, int st
   }
   while (Drivetrain.velocity(rpm) > stopThresh) {
     Drivetrain.drive(forward, Drivetrain.velocity(rpm) - dec, rpm);
+    wait(INTERVAL, seconds);
   }
   Drivetrain.stop(brake);
 }
