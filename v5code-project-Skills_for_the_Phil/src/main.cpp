@@ -53,30 +53,19 @@ void pre_auton(void)
  Brain.Screen.print("6096A");
  Brain.Screen.setCursor(5,4);
  Brain.Screen.setPenColor(white);
- Brain.Screen.print("ROBORAYS1"); 
-
-
-
-
+ Brain.Screen.print("ROBORAYS1");
 }
 
 
 void bringBackClampDown()
 {
    BackClamp.rotateFor(fwd, 1250, degrees, 200, velocityUnits::rpm);
-  
 }
 
 void bringBackClampUp()
 {
    BackClamp.startRotateFor(fwd, -1250, degrees, 200, velocityUnits::rpm);
-  
 }
-
-
-// void cycleConveyor() {
-//   Conveyor.spin(fwd, 160, velocityUnits::rpm);
-// }
 
 void bringClampDown(){
   Clamp.spin(forward, 100, velocityUnits::rpm);
@@ -85,9 +74,28 @@ void bringClampDown(){
 void bringClampUp(){
   Clamp.rotateFor(reverse, 165, degrees);
 }
+
+int stopDistance(int vel, int acc, int INTERVAL, int stopThresh) {
+  int d = 0;
+  for (; vel > stopThresh; vel -= acc)
+    d += vel * INTERVAL;
+  return d;
+}
+
+void move(double inches, int travelVel = 200, int acc = 10, int dec = 10, int stopThresh = 20) {
+  int pos = 0; int INTERVAL = 100;
+  for (int vel = 0; inches - pos > stopDistance(vel, dec, INTERVAL, stopThresh); vel += (vel + acc <= travelVel) ? vel + acc : travelVel) {
+    Drivetrain.drive(forward, vel, rpm);
+    wait(INTERVAL, seconds);
+  }
+  while (Drivetrain.velocity(rpm) > stopThresh) {
+    Drivetrain.drive(forward, Drivetrain.velocity(rpm) - dec, rpm);
+  }
+  Drivetrain.stop(brake);
+}
 //red bottom autonomous/Blue Top
 void autonomous(void) {
-wait(1, seconds);
+  wait(1, seconds);
   Drivetrain.setDriveVelocity(50,rpm);
   FourBar.setVelocity(100, rpm);
   Drivetrain.driveFor(reverse, 12, inches);
@@ -125,14 +133,6 @@ wait(1, seconds);
   Drivetrain.turnToHeading(160, degrees);
   Drivetrain.driveFor(reverse, -36, inches, 200, velocityUnits::rpm);
   Clamp.spinFor(reverse,100,degrees);
-
-
-
-
-
-  
-  
-  
 }
 
 
