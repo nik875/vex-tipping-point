@@ -1,3 +1,15 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// FourBar              motor         20              
+// BackClamp            motor         1               
+// Clamp                motor         21              
+// Conveyor             motor         16              
+// Controller1          controller                    
+// Controller2          controller                    
+// Drivetrain           drivetrain    18, 5, 10, 2, 9 
+// BackClampLimit       bumper        A               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -76,7 +88,7 @@ void bringBackClampUp()
 
 // void cycleConveyor() {
 //   Conveyor.spin(fwd, 160, velocityUnits::rpm);
-// }
+// 
 
 void bringClampDown(){
   Clamp.spin(forward, 100, velocityUnits::rpm);
@@ -87,12 +99,16 @@ void bringClampUp(){
 }
 //red bottom autonomous/Blue Top
 void autonomous(void) {
-wait(1, seconds);
+  BackClamp.setStopping(hold);
+  FourBar.setMaxTorque(100, pct);
+  wait(1, seconds);
   Drivetrain.setDriveVelocity(50,rpm);
   FourBar.setVelocity(100, rpm);
-  Drivetrain.driveFor(reverse, 12, inches);
-  BackClamp.spinFor(forward, 2290, degrees, 200, velocityUnits::rpm);
-  Conveyor.spin(forward, 300, velocityUnits::rpm);
+  Drivetrain.driveFor(reverse, 13, inches);
+  BackClamp.spin(forward, 200, velocityUnits::rpm);
+  waitUntil(BackClampLimit.pressing());
+  BackClamp.stop();
+   Conveyor.spin(forward, 300, velocityUnits::rpm);
   Drivetrain.turnToHeading(85, degrees);
   Drivetrain.driveFor(forward, 24, inches);
   Drivetrain.turnToHeading(173, degrees);
@@ -103,11 +119,11 @@ wait(1, seconds);
   FourBar.spinFor(reverse, 826, degrees);
   Drivetrain.driveFor(forward, 45, inches);
   Drivetrain.turnToHeading(93, degrees);
-  BackClamp.spinFor(forward, -500, degrees, 200, velocityUnits::rpm);
+  BackClamp.spinToPosition(0, degrees, 200, velocityUnits::rpm);
   Drivetrain.driveFor(forward, 30, inches); 
   Drivetrain.turnToHeading(180, degrees);
   Drivetrain.driveFor(forward, 9, inches);
-  FourBar.spinFor(forward, 370, degrees);
+  FourBar.spinFor(forward, 384, degrees);
   Clamp.spinFor(reverse, 100, degrees);
   wait(0.5, seconds);
   FourBar.spinFor(forward, -80, degrees);
@@ -115,16 +131,21 @@ wait(1, seconds);
 
   //pushy stuff
   Drivetrain.driveFor(forward, -8.5, inches);
-  FourBar.spinFor(540, degrees);
-  Drivetrain.turnToHeading(355, degrees);
-  Drivetrain.driveFor(reverse, -56, inches, 100, velocityUnits::rpm);
-  Drivetrain.turnToHeading(125, degrees);
-  Drivetrain.driveFor(reverse, -36, inches, 100, velocityUnits::rpm);
+  FourBar.spinFor(550, degrees);
+  Drivetrain.turnToHeading(358, degrees);
+  Drivetrain.driveFor(forward, 56, inches, 100, velocityUnits::rpm);
+  Drivetrain.turnToHeading(118, degrees);
+  Drivetrain.driveFor(reverse, -33, inches, 200, velocityUnits::rpm);
+  Drivetrain.driveFor(forward, 4, inches, 50, velocityUnits::rpm);
   Clamp.spin(forward);
   wait(1, seconds);
-  Drivetrain.turnToHeading(160, degrees);
-  Drivetrain.driveFor(reverse, -36, inches, 200, velocityUnits::rpm);
+  FourBar.spinFor(reverse, 826, degrees);
+  wait(0.25, seconds);
+  Drivetrain.turnToHeading(175, degrees);
+  Drivetrain.driveFor(reverse, -39, inches, 200, velocityUnits::rpm);
   Clamp.spinFor(reverse,100,degrees);
+
+  
 
 
 

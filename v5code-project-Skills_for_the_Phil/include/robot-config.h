@@ -10,6 +10,7 @@ extern motor Conveyor;
 extern controller Controller1;
 extern controller Controller2;
 extern smartdrive Drivetrain;
+extern bumper BackClampLimit;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
