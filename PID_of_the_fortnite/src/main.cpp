@@ -19,6 +19,7 @@ BUILTINS FOR COMPETITION FORMAT
 
 #include "vex.h"
 #include <math.h>
+#include "VisionSensor.h"
 using namespace vex;
 
 // A global instance of competition
@@ -50,6 +51,7 @@ void pre_auton(void) {
   Brain.Screen.setCursor(5, 4);
   Brain.Screen.setPenColor(white);
   Brain.Screen.print("ROBORAYS1");
+  Drivetrain.drive(forward, 1, rpm);
 }
 
 /*//////////////////////////////////////////////////////////////////////////
@@ -62,6 +64,8 @@ AUTONOMOUS (INCLUDING ALL FUNCTIONS)
 int timestep = 10;  // Delay for PID, in ms
 // OPTIMIZE
 double k = 10;  // Maximum amount drivetrain may increase/decrease power for PID
+// OPTIMIZE
+double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
 // OPTIMIZE
 int ACC_RATE = 50;  // Maximum amount of acceleration (rpm / s)
@@ -70,12 +74,21 @@ int targetPos = 0;  // Position we should be at in PID
 // OPTIMIZE
 int DEC_RATE = 50;  // Rate of decelleration with braking scheme (rpm / s)
 
+int visionSample(vision::signature sig, int n) {
+  int sum = 0;
+  for (int i = 0; i < n; i ++) {
+    AllSeeingEye.takeSnapshot(sig);
+    sum += AllSeeingEye.largestObject.centerX;
+  }
+  return sum / n;
+}
+
 double average(double a, double b) {  // Average of two numbers
   return (a + b) / 2;
 }
 
 double degreesToDistance(double deg) {  // Convert a degree value of an encoder to a distance
-  return 0;
+  return deg / DEGREESPERINCH;
 }
 
 void accelerate() {  // Increases vel as time passes
@@ -88,6 +101,10 @@ void accelerate() {  // Increases vel as time passes
 
 double correct(double lead) {  // Converts a lead in inches to a velocity correction
   return tanh(lead) * k;
+}
+
+double visionCorrect(int x) {  // Converts a vision sensor deviation from target center x to left drive correction
+  return x / 128 * kVis;
 }
 
 double stopDistance() {  // Calculate how much distance we need to fully stop the robot
@@ -110,7 +127,21 @@ void stop() {  // Custom braking scheme
   }
 }
 
-void move(double dist) {  // Drive forward a given distance with PID and acceleration curve
+double alignNeutral() {  // Correct motion to align to neutral goal
+  return visionCorrect(visionSample(NEUTRAL, 100) - 128);
+}
+
+double alignRed() {  // Correct motion to align to red alliance goal
+  return visionCorrect(visionSample(RED_ALLIANCE, 100) - 128);
+}
+
+double alignBlue() {  // Correct motion to align to blue alliance goal
+  return visionCorrect(visionSample(BLUE_ALLIANCE, 100) - 128);
+}
+
+// Drive forward a given distance with PID and acceleration curve
+// Optional correction function which can modify drivetrain
+void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
   // Reset encoder positions
   leftEncoder.resetRotation();
   rightEncoder.resetRotation();
@@ -124,8 +155,8 @@ void move(double dist) {  // Drive forward a given distance with PID and acceler
       ) > stopDistance()) {
     double leftLead = degreesToDistance(leftEncoder.position(degrees)) - targetPos;
     double rightLead = degreesToDistance(rightEncoder.position(degrees)) - targetPos;
-    double leftVel = vel + correct(leftLead);
-    double rightVel = vel + correct(rightLead);
+    double leftVel = vel + correct(leftLead) + correctionFunc() / 2;  // Divide correctionFunc() by 2 to equally correct both sides
+    double rightVel = vel + correct(rightLead) - correctionFunc() / 2;
     targetPos += average(leftVel, rightVel) * timestep;
     leftDrive.spin(forward, leftVel, rpm);
     rightDrive.spin(forward, rightVel, rpm);
@@ -136,7 +167,7 @@ void move(double dist) {  // Drive forward a given distance with PID and acceler
 }
 
 void autonomous(void) {
-
+  move(12, alignNeutral);
 }
 
 /*//////////////////////////////////////////////////////////////////////////
@@ -165,6 +196,9 @@ void usercontrol(void) {
   thread(driveUsercontrol).detach();
   while (true) {
     fourBarUsercontrol();  // Controls four bar up and down with contorller 2
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 2);
+    Controller1.Screen.print(visionSample(NEUTRAL, 50));
   }
 }
 
