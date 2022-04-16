@@ -8,32 +8,31 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
+
 controller Controller1(primary);
 controller Controller2(partner);
-motor FourBar(PORT20, ratio36_1, false);
-motor Conveyor(PORT16, ratio6_1, false);
-pneumatics frontClamp(Brain.ThreeWirePort.D);
-pneumatics goalCover(Brain.ThreeWirePort.F);
-pneumatics backClamp1(Brain.ThreeWirePort.E);
-pneumatics backClamp2(Brain.ThreeWirePort.G);
-bumper BackClampLimit(Brain.ThreeWirePort.A);
-motor LF(PORT18, ratio18_1, false);
-motor LB(PORT5, ratio18_1, false);
-motor RF(PORT10, ratio18_1, true);
-motor RB(PORT2, ratio18_1, true);
-motor LM(PORT1, ratio18_1, false);
-motor RM(PORT4, ratio18_1, true);
+motor FourBar(PORT1, ratio36_1, true);
+motor FourBarConveyor(PORT6, ratio36_1, false);
+digital_out frontClamp(Brain.ThreeWirePort.E);
+digital_out goalCover(Brain.ThreeWirePort.F);
+digital_out backClamp1(Brain.ThreeWirePort.G);
+motor LF(PORT2, ratio6_1, true);
+motor LB(PORT15, ratio6_1, true);
+motor RF(PORT19, ratio6_1, false);
+motor RB(PORT9, ratio6_1, false);
+motor LM(PORT11, ratio6_1, false);
+motor RM(PORT7, ratio6_1, true);
 // vision AllSeeingEye(PORT11);
-inertial Inertial(PORT9);
-encoder leftEncoder(Brain.ThreeWirePort.B);
-encoder rightEncoder(Brain.ThreeWirePort.C);
+inertial Inertial(PORT10);
 motor_group leftDrive(LF, LB, LM);
 motor_group rightDrive(RF, RB, RM);
 smartdrive Drivetrain(leftDrive, rightDrive, Inertial, 4 * 3.14, 15.5, 10.5, inches, 1);
+encoder leftEncoder = encoder(Brain.ThreeWirePort.A);
+encoder rightEncoder = encoder(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
-// define variable for remote controller enable/disable
-bool RemoteControlCodeEnabled = true;
+
+
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

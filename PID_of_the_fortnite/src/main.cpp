@@ -1,14 +1,8 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// FourBar              motor         20
-// BackClamp            motor         1
-// Clamp                motor         21
-// Conveyor             motor         16
-// Controller1          controller
-// Controller2          controller
-// Drivetrain           drivetrain    18, 5, 10, 2, 9
-// BackClampLimit       bumper        A
+// leftEncoder          encoder       A, B            
+// rightEncoder         encoder       C, D            
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*//////////////////////////////////////////////////////////////////////////
@@ -38,6 +32,7 @@ PRE-AUTON (INCLUDING ALL FUNCTIONS)
 void pre_auton(void) {
   // I0nitializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+  frontClamp.set(true);
   Drivetrain.setStopping(brake);
   Brain.Screen.setFont(propXXL);
   Brain.Screen.setCursor(1, 2);
@@ -59,11 +54,25 @@ void pre_auton(void) {
 AUTONOMOUS (INCLUDING ALL FUNCTIONS)
 
 //////////////////////////////////////////////////////////////////////////*/
+//regular functions
+
+void BackFortnite() {
+backClamp1.set(true);
+}
+
+void BackFortnite2(){
+  backClamp1.set(false);
+  }
+
+
+
+//PID FUNCTIONS
+
 
 // OPTIMIZE
 int timestep = 10;  // Delay for PID, in ms
 // OPTIMIZE
-double k = 10;  // Maximum amount drivetrain may increase/decrease power for PID
+double k = 20;  // Maximum amount drivetrain may increase/decrease power for PID
 // OPTIMIZE
 double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
@@ -167,7 +176,18 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
 }
 
 void autonomous(void) {
-  move(12, alignNeutral);
+  /*///////////////////////////////////
+    1 DEGREE = 0.0239982 inches
+
+    1 INCH = 41.6697919 degrees
+  ///////////////////////////////////*/
+
+  
+ move(10000);
+ 
+
+
+  
 }
 
 /*//////////////////////////////////////////////////////////////////////////
@@ -178,27 +198,132 @@ USERCONTROL (INCLUDING ALL FUNCTIONS)
 
 void driveUsercontrol() {  // Tank drive
   while (true) {
-    leftDrive.spin(forward, Controller1.Axis3.value(), pct);
+    leftDrive.spin(forward, Controller1.Axis3.value(),  pct);
     rightDrive.spin(forward, Controller1.Axis2.value(), pct);
+    
+    
+    
   }
 }
 
-void fourBarUsercontrol() {  // FourBar - Axis 2 (Right Joystick)
-  if (Controller2.Axis2.value() > 2 || Controller2.Axis2.value() < -2) {
-    FourBar.spin(forward, -Controller2.Axis2.value(), pct);
-  } else {
-    FourBar.spin(forward, 0, pct);
+// void fourBarUsercontrol() {  // FourBar - Axis 2 (Right Joystick)
+//   if (Controller2.Axis2.value() > 2 || Controller2.Axis2.value() < -2) {
+//     FourBar.spin(forward, -Controller2.Axis2.value(), pct);
+//   } else {
+//     FourBar.spin(forward, 0, pct);
+//   }
+// }
+
+int x=0, y=1;
+
+int ConveyorValue=0;
+
+bool open=true;
+void frontClamp1()
+{
+ open=!open;
+}
+ 
+
+
+// void fourBarConveyorUserControl() {  // FourBar&Conveyor - Axis 2 (Right Joystick)
+//   if (Controller2.Axis2.value() > 0) {
+//     FourBar.spin(forward, -Controller2.Axis2.value(), pct);
+//     FourBarConveyor.spin(forward, -Controller2.Axis2.value(), pct);
+//   } else if(Controller2.Axis2.value() < 0) {
+//     FourBar.spin(forward, 0, pct);
+//   }
+// }
+
+void frontClampUserControl(){
+if(Controller2.ButtonR1.pressing()){
+  frontClamp.set(true);
+}
+else if(Controller2.ButtonR2.pressing()){
+  frontClamp.set(false);
+}
+}
+
+void ConveyorUserControl(){
+  if(Controller2.ButtonA.pressing()){
+    ConveyorValue=1;
+  }
+  if(Controller2.ButtonX.pressing()){
+    ConveyorValue=0;
+  }
+  if(abs(Controller2.Axis2.value()) < 2){
+    if(ConveyorValue==1){
+      FourBarConveyor.spin(reverse);
+    }
+    else if(ConveyorValue==0){
+      FourBarConveyor.stop();
+    }
   }
 }
+
+void fourBarUsercontrol(){
+if (Controller2.Axis2.value() > 0) {
+    FourBar.spin(forward, Controller2.Axis2.value(), pct);
+    FourBarConveyor.spin(forward, Controller2.Axis2.value(), pct);
+  } else if(Controller2.Axis2.value() < 0) {
+    FourBar.spin(forward, 0, pct);
+  }
+else{
+  FourBar.spin(forward, 0, pct);
+  FourBarConveyor.spin(forward, 0, pct);
+}
+}
+
+
+
+
+
+
+void backClampUserControl(){
+
+if(Controller2.ButtonL2.pressing()){
+   vex::digital_out backClamp1(Brain.ThreeWirePort.G);
+    backClamp1.set(true);
+  }
+  else if(Controller2.ButtonL1.pressing()){
+     vex::digital_out backClamp1(Brain.ThreeWirePort.G);
+    backClamp1.set(false);
+  }
+}
+
+
 
 void usercontrol(void) {
   // Runs drive code as a thread so we can always control the robot
   thread(driveUsercontrol).detach();
+  Drivetrain.setStopping(coast);
+  
   while (true) {
+    if(Controller2.ButtonR2.pressing()){
+      vex::digital_out frontClamp(Brain.ThreeWirePort.A);
+      frontClamp.set(true);
+    }
+
+    else if(Controller2.ButtonR1.pressing()){
+      vex::digital_out frontClamp(Brain.ThreeWirePort.A);
+      frontClamp.set(false);
+    }
+    if(Controller2.ButtonL1.pressing()){
+      vex::digital_out backClamp1(Brain.ThreeWirePort.G);
+      backClamp1.set(true);
+
+    }
+
+    else if(Controller2.ButtonR1.pressing()){
+      vex::digital_out backClamp1(Brain.ThreeWirePort.G);
+      backClamp1.set(false);
+    }
+    
     fourBarUsercontrol();  // Controls four bar up and down with contorller 2
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(1, 2);
     Controller1.Screen.print(visionSample(NEUTRAL, 50));
+    // backClampUserControl();
   }
 }
 
