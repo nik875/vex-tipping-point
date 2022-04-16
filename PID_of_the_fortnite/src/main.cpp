@@ -103,7 +103,7 @@ double degreesToDistance(double deg) {  // Convert a degree value of an encoder 
 void accelerate() {  // Increases vel as time passes
   while (vel + ACC_RATE / 100 <= maxVel) {
     vel += ACC_RATE / 100;
-    wait(10, msec);
+    wait(timestep, msec);
   }
   vel = maxVel;
 }
@@ -125,6 +125,14 @@ double stopDistance() {  // Calculate how much distance we need to fully stop th
     v -= DEC_RATE * timestep;
   }
   return d;
+}
+
+bool canStop(double dist) {  // If we have enough distance left to stop our robot
+  return dist - degreesToDistance(
+    average(
+      leftEncoder.position(degrees), 
+      rightEncoder.position(degrees))) 
+    > stopDistance();
 }
 
 void stop() {  // Custom braking scheme
@@ -158,12 +166,9 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
   targetPos = 0;  // Reset target position
   thread acc(accelerate);  // Update velocity independently of our code
   acc.detach();
-  while (dist - degreesToDistance(  // While we have enough distance to stop
-      average(
-        leftEncoder.position(degrees), rightEncoder.position(degrees))
-      ) > stopDistance()) {
-    double leftLead = degreesToDistance(leftEncoder.position(degrees)) - targetPos;
-    double rightLead = degreesToDistance(rightEncoder.position(degrees)) - targetPos;
+  while (canStop(dist)) {  // While we have enough space left to stop our robot
+    double leftLead = targetPos - degreesToDistance(leftEncoder.position(degrees));
+    double rightLead = targetPos - degreesToDistance(rightEncoder.position(degrees));
     double leftVel = vel + correct(leftLead) + correctionFunc() / 2;  // Divide correctionFunc() by 2 to equally correct both sides
     double rightVel = vel + correct(rightLead) - correctionFunc() / 2;
     targetPos += average(leftVel, rightVel) * timestep;
