@@ -185,19 +185,21 @@ void autonomous(void) {
   //function that makes it move while goal cover is doing the fortnite
   frontClamp.set(false);
  thread t = thread([]
- {Drivetrain.driveFor(forward, 70, inches, 600, velocityUnits::rpm);});
+ {Drivetrain.driveFor(forward, 60, inches, 600, velocityUnits::rpm);});
  t.detach();
  goalCover.set(true);
  t.join();
- frontClamp.set(false);
- Drivetrain.driveFor(forward, 18, inches, 50, velocityUnits::rpm);
+ Drivetrain.driveFor(forward, 12, inches, 50, velocityUnits::rpm);
   frontClamp.set(true);
   wait(200, msec);
-  Drivetrain.driveFor(reverse, 50, inches, 600, velocityUnits::rpm);
+  FourBar.startRotateFor(fwd, 300, degrees);
+  FourBarConveyor.rotateFor(fwd, 300, degrees);
+  Drivetrain.driveFor(reverse, 37, inches, 600, velocityUnits::rpm);
   Drivetrain.turnToHeading(285, degrees);
-  frontClamp.set(false);
-  Drivetrain.driveFor(reverse, 24, inches, 300, velocityUnits::rpm);
+  Drivetrain.driveFor(reverse, 22, inches, 300, velocityUnits::rpm);
   backClamp1.set(true);
+  wait(1, seconds);
+  FourBarConveyor.stop();
   //Drivetrain.driveFor(forward, 35, inches, 600, velocityUnits::rpm);
   //wait(0.5, seconds);
   // fourBarConveyor.spin(forward);
