@@ -291,7 +291,7 @@ void GoalCoverUserControl(){
 }
 
 void fourBarUsercontrol(){
-    if(Controller2.ButtonA.pressing()){
+  if(Controller2.ButtonA.pressing()){
     
     FourBarConveyor.spin(reverse, 100, velocityUnits::rpm);
     x=1;
@@ -300,15 +300,14 @@ void fourBarUsercontrol(){
     FourBarConveyor.stop();
     x=0;
   }
-if(x==0) {
-    FourBar.spin(forward, Controller2.Axis2.value(),  pct);
-    FourBarConveyor.spin(forward, Controller2.Axis2.value(), pct);
+  if(x==0) {
+      FourBar.spin(forward, Controller2.Axis2.value(),  pct);
+      FourBarConveyor.spin(forward, Controller2.Axis2.value(), pct);
+  }
+  if(Controller2.Axis2.value() >= 2 || Controller2.Axis2.value() <= 2){
+      FourBarConveyor.stop();
 }
-if(x==1){
-    FourBar.spin(forward, Controller2.Axis2.value(),  pct); 
 }
-}
-
 
 
 
