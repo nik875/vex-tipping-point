@@ -32,21 +32,21 @@ PRE-AUTON (INCLUDING ALL FUNCTIONS)
 void pre_auton(void) {
   // I0nitializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  frontClamp.set(true);
-  Drivetrain.setStopping(brake);
-  Brain.Screen.setFont(propXXL);
-  Brain.Screen.setCursor(1, 2);
-  Brain.Screen.setFillColor(transparent);
-  Brain.Screen.setPenColor(green);
-  Brain.Screen.setPenWidth(10);
-  Brain.Screen.print("6096A");
-  Brain.Screen.setCursor(1, 11);
-  Brain.Screen.setPenColor(red);
-  Brain.Screen.print("6096A");
-  Brain.Screen.setCursor(5, 4);
-  Brain.Screen.setPenColor(white);
-  Brain.Screen.print("ROBORAYS1");
-  Drivetrain.drive(forward, 1, rpm);
+  // frontClamp.set(true);
+  // Drivetrain.setStopping(brake);
+  // Brain.Screen.setFont(propXXL);
+  // Brain.Screen.setCursor(1, 2);
+  // Brain.Screen.setFillColor(transparent);
+  // Brain.Screen.setPenColor(green);
+  // Brain.Screen.setPenWidth(10);
+  // Brain.Screen.print("6096A");
+  // Brain.Screen.setCursor(1, 11);
+  // Brain.Screen.setPenColor(red);
+  // Brain.Screen.print("6096A");
+  // Brain.Screen.setCursor(5, 4);
+  // Brain.Screen.setPenColor(white);
+  // Brain.Screen.print("ROBORAYS1");
+  // Drivetrain.drive(forward, 1, rpm);
 }
 
 /*//////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ void BackFortnite2(){
 
 
 // OPTIMIZE
-int timestep = 10;  // Delay for PID, in ms
+int timestep = 20;  // Delay for PID, in ms
 // OPTIMIZE
 double k = 20;  // Maximum amount drivetrain may increase/decrease power for PID
 // OPTIMIZE
@@ -172,8 +172,8 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
     double leftVel = vel + correct(leftLead) + correctionFunc() / 2;  // Divide correctionFunc() by 2 to equally correct both sides
     double rightVel = vel + correct(rightLead) - correctionFunc() / 2;
     targetPos += average(leftVel, rightVel) * timestep;
-    leftDrive.spin(forward, leftVel, rpm);
-    rightDrive.spin(forward, rightVel, rpm);
+     leftDrive.spin(forward, leftVel, rpm);
+     rightDrive.spin(forward, rightVel, rpm);
     wait(timestep, msec);
   }
   acc.interrupt();
@@ -187,7 +187,7 @@ void autonomous(void) {
     1 INCH = 41.6697919 degrees
   ///////////////////////////////////*/
 
-  
+  Drivetrain.driveFor(forward, 1, inches);
  move(10000);
  
 
@@ -203,6 +203,7 @@ USERCONTROL (INCLUDING ALL FUNCTIONS)
 
 void driveUsercontrol() {  // Tank drive
   while (true) {
+    Controller1.Screen.print(rightDrive);
     leftDrive.spin(forward, Controller1.Axis3.value(),  pct);
     rightDrive.spin(forward, Controller1.Axis2.value(), pct);
     
@@ -327,7 +328,7 @@ void usercontrol(void) {
     fourBarUsercontrol();  // Controls four bar up and down with contorller 2
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(1, 2);
-    Controller1.Screen.print(visionSample(NEUTRAL, 50));
+    // Controller1.Screen.print(visionSample(NEUTRAL, 50));
     // backClampUserControl();
   }
 }

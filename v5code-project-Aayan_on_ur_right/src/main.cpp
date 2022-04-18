@@ -1,3 +1,14 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// Drivetrain           drivetrain    18, 5, 10, 2, 9 
+// Controller1          controller                    
+// Controller2          controller                    
+// Conveyor             motor         16              
+// FourBar              motor         20              
+// Clamp                motor         21              
+// BackClamp            motor         1               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 // ----------------------------------------------------------------------------
 //                                                                            
 //    Project:                                               

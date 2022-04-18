@@ -152,6 +152,8 @@ double alignBlue() {  // Correct motion to align to blue alliance goal
 // Optional correction function which can modify drivetrain
 void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
   // Reset encoder positions
+
+  //Brain.Screen.print()
   leftEncoder.resetRotation();
   rightEncoder.resetRotation();
   vel = 0;  // Reset velocity
@@ -251,6 +253,7 @@ USERCONTROL (INCLUDING ALL FUNCTIONS)
 
 void driveUsercontrol() {  // Tank drive
   while (true) {
+    Controller1.Screen.print(rightDrive);
     leftDrive.spin(forward, Controller1.Axis3.value(),  pct);
     rightDrive.spin(forward, Controller1.Axis2.value(), pct);
     
@@ -304,9 +307,10 @@ void fourBarUsercontrol(){
       FourBar.spin(forward, Controller2.Axis2.value(),  pct);
       FourBarConveyor.spin(forward, Controller2.Axis2.value(), pct);
   }
-  if(Controller2.Axis2.value() >= 2 || Controller2.Axis2.value() <= 2){
-      FourBarConveyor.stop();
-}
+  if(x==1){
+    FourBar.spin(forward, Controller2.Axis2.value(),pct);
+  }
+  
 }
 
 
@@ -361,7 +365,6 @@ void usercontrol(void) {
     GoalCoverUserControl();
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(1, 2);
-    Controller1.Screen.print(visionSample(NEUTRAL, 50));
     // backClampUserControl();
   }
 }
