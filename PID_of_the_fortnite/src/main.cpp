@@ -78,7 +78,7 @@ double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
 // OPTIMIZE
 int ACC_RATE = 50;  // Maximum amount of acceleration (rpm / s)
-int vel = 600;  // Velocity for PID (reset in move)
+int vel = 0;  // Velocity for PID (reset in move)
 int targetPos = 0;  // Position we should be at in PID
 // OPTIMIZE
 int DEC_RATE = 50;  // Rate of decelleration with braking scheme (rpm / s)
@@ -100,14 +100,6 @@ double degreesToDistance(double deg) {  // Convert a degree value of an encoder 
   return deg / DEGREESPERINCH;
 }
 
-void accelerate() {  // Increases vel as time passes
-  while (vel + ACC_RATE / 100 <= maxVel) {
-    vel += ACC_RATE / 100;
-    wait(timestep, msec);
-  }
-  vel = maxVel;
-}
-
 double correct(double lead) {  // Converts a lead in inches to a velocity correction
   return tanh(lead) * k;
 }
@@ -118,13 +110,14 @@ double visionCorrect(int x) {  // Converts a vision sensor deviation from target
 
 double stopDistance() {  // Calculate how much distance we need to fully stop the robot
   // Simulate a stopping action
-  int d = 0;  // Distance we travelled so far
-  int v = average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm));
-  while (v > 0) {
-    d += v * timestep;
-    v -= DEC_RATE * timestep;
-  }
-  return d;
+  // int d = 0;  // Distance we travelled so far
+  // int v = average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm));
+  // while (v > 0) {
+  //   d += v * timestep;
+  //   v -= DEC_RATE * timestep;
+  // }
+  // return d;
+  return 0;
 }
 
 bool canStop(double dist) {  // If we have enough distance left to stop our robot
@@ -136,12 +129,13 @@ bool canStop(double dist) {  // If we have enough distance left to stop our robo
 }
 
 void stop() {  // Custom braking scheme
-  while (average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm)) > 0) {
-    Drivetrain.stop(brake);
-    wait(10, msec);
-    Drivetrain.stop(coast);
-    wait(30, msec);
-  }
+  // while (average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm)) > 0) {
+  //   Drivetrain.stop(brake);
+  //   wait(10, msec);
+  //   Drivetrain.stop(coast);
+  //   wait(30, msec);
+  // }
+  Drivetrain.stop(brake);
 }
 
 double alignNeutral() {  // Correct motion to align to neutral goal
@@ -162,21 +156,29 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
   // Reset encoder positions
   leftEncoder.resetRotation();
   rightEncoder.resetRotation();
+
   vel = 0;  // Reset velocity
   targetPos = 0;  // Reset target position
-  thread acc(accelerate);  // Update velocity independently of our code
-  acc.detach();
+
   while (canStop(dist)) {  // While we have enough space left to stop our robot
     double leftLead = targetPos - degreesToDistance(leftEncoder.position(degrees));
     double rightLead = targetPos - degreesToDistance(rightEncoder.position(degrees));
+
     double leftVel = vel + correct(leftLead) + correctionFunc() / 2;  // Divide correctionFunc() by 2 to equally correct both sides
     double rightVel = vel + correct(rightLead) - correctionFunc() / 2;
     targetPos += average(leftVel, rightVel) * timestep;
-     leftDrive.spin(forward, leftVel, rpm);
-     rightDrive.spin(forward, rightVel, rpm);
+
+    leftDrive.spin(forward, leftVel, rpm);
+    rightDrive.spin(forward, rightVel, rpm);
+
+    if (vel + ACC_RATE / 100 <= maxVel)
+      vel += ACC_RATE / 100;
+    else
+      vel = maxVel;
+    
     wait(timestep, msec);
   }
-  acc.interrupt();
+
   stop();
 }
 
@@ -186,8 +188,7 @@ void autonomous(void) {
 
     1 INCH = 41.6697919 degrees
   ///////////////////////////////////*/
-
-  Drivetrain.driveFor(forward, 1, inches);
+  
  move(10000);
  
 
