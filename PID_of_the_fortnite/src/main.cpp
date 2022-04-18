@@ -78,7 +78,7 @@ double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
 // OPTIMIZE
 int ACC_RATE = 50;  // Maximum amount of acceleration (rpm / s)
-int vel = 0;  // Velocity for PID (reset in move)
+int vel = 600;  // Velocity for PID (reset in move)
 int targetPos = 0;  // Position we should be at in PID
 // OPTIMIZE
 int DEC_RATE = 50;  // Rate of decelleration with braking scheme (rpm / s)
