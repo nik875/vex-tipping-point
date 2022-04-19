@@ -30,7 +30,7 @@ PRE-AUTON (INCLUDING ALL FUNCTIONS)
 //////////////////////////////////////////////////////////////////////////*/
 
 void pre_auton(void) {
-  // I0nitializing Robot Configuration. DO NOT REMOVE!
+  // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   frontClamp.set(true);
   Drivetrain.setStopping(brake);

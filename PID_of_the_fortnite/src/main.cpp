@@ -77,8 +77,8 @@ double k = 20;  // Maximum amount drivetrain may increase/decrease power for PID
 double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
 // OPTIMIZE
-int ACC_RATE = 50;  // Maximum amount of acceleration (rpm / s)
-int vel = 0;  // Velocity for PID (reset in move)
+int ACC_RATE = 20;  // Maximum amount of acceleration (rpm / s)
+double vel = 0;  // Velocity for PID (reset in move)
 int targetPos = 0;  // Position we should be at in PID
 // OPTIMIZE
 int DEC_RATE = 50;  // Rate of decelleration with braking scheme (rpm / s)
@@ -175,8 +175,9 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
       vel += ACC_RATE / 100;
     else
       vel = maxVel;
-    
+    Controller1.Screen.print(vel);
     wait(timestep, msec);
+    
   }
 
   stop();
@@ -204,7 +205,6 @@ USERCONTROL (INCLUDING ALL FUNCTIONS)
 
 void driveUsercontrol() {  // Tank drive
   while (true) {
-    Controller1.Screen.print(rightDrive);
     leftDrive.spin(forward, Controller1.Axis3.value(),  pct);
     rightDrive.spin(forward, Controller1.Axis2.value(), pct);
     
