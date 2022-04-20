@@ -77,7 +77,7 @@ double k = 20;  // Maximum amount drivetrain may increase/decrease power for PID
 double kVis = 10;  // Maximum amount vision sensor may increase/decrease power
 int maxVel = 200 - k;  // Maximum velocity that we're allowed to move
 // OPTIMIZE
-int ACC_RATE = 20;  // Maximum amount of acceleration (rpm / s)
+double ACC_RATE = 20;  // Maximum amount of acceleration (rpm / s)
 double vel = 0;  // Velocity for PID (reset in move)
 int targetPos = 0;  // Position we should be at in PID
 // OPTIMIZE
@@ -171,11 +171,12 @@ void move(double dist, double (*correctionFunc)() = []()->double{return 0;}) {
     leftDrive.spin(forward, leftVel, rpm);
     rightDrive.spin(forward, rightVel, rpm);
 
-    if (vel + ACC_RATE / 100 <= maxVel)
+    if (vel + ACC_RATE / 100 <= maxVel){
       vel += ACC_RATE / 100;
+      Controller1.Screen.print(vel);
+    }
     else
       vel = maxVel;
-    Controller1.Screen.print(vel);
     wait(timestep, msec);
     
   }
