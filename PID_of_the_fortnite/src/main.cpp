@@ -54,18 +54,6 @@ void pre_auton(void) {
 AUTONOMOUS (INCLUDING ALL FUNCTIONS)
 
 //////////////////////////////////////////////////////////////////////////*/
-//regular functions
-
-void BackFortnite() {
-backClamp1.set(true);
-}
-
-void BackFortnite2(){
-  backClamp1.set(false);
-  }
-
-
-
 //PID FUNCTIONS
 
 
@@ -129,12 +117,12 @@ bool canStop(double dist) {  // If we have enough distance left to stop our robo
 }
 
 void stop() {  // Custom braking scheme
-  // while (average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm)) > 0) {
-  //   Drivetrain.stop(brake);
-  //   wait(10, msec);
-  //   Drivetrain.stop(coast);
-  //   wait(30, msec);
-  // }
+  while (average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm)) > 0) {
+    Drivetrain.stop(brake);
+    wait(10, msec);
+    Drivetrain.spin(forward, average(leftEncoder.velocity(rpm), rightEncoder.velocity(rpm)), rpm);
+    wait(30, msec);
+  }
   Drivetrain.stop(brake);
 }
 
