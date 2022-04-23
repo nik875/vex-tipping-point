@@ -259,15 +259,13 @@ void autonomous(void) {
  t.join();
  frontClamp.set(true);
  wait(2, msec);
- Drivetrain.turn(right);
- wait(1, msec);
  Drivetrain.driveFor(reverse, 38, inches, 600, velocityUnits::rpm);
- Drivetrain.turnToHeading(295, degrees);
- Drivetrain.driveFor(reverse, 24, inches, 450, velocityUnits::rpm);
+ Drivetrain.turnToHeading(300, degrees);
+ Drivetrain.driveFor(reverse, 24, inches, 300, velocityUnits::rpm);
  backClamp1.set(true);
  Drivetrain.driveFor(forward, 3, inches, 400, velocityUnits::rpm);
- FourBar.startRotateFor(400, degrees, 100, velocityUnits::rpm);
- FourBarConveyor.rotateFor(forward, 400, degrees, 100, velocityUnits::rpm);
+ FourBar.startRotateFor(100, degrees, 100, velocityUnits::rpm);
+ FourBarConveyor.rotateFor(forward, 100, degrees, 100, velocityUnits::rpm);
  wait(0.5, sec);
  FourBarConveyor.spin(reverse);
 
