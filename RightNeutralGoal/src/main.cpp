@@ -262,8 +262,8 @@ void autonomous(void) {
  wait(2, msec);
  Drivetrain.driveFor(reverse, 47, inches, 600, velocityUnits::rpm);
  Drivetrain.turnToHeading(270, degrees);
-Drivetrain.driveFor(reverse, 14, inches, 200, velocityUnits::rpm);
- wait(5, msec);
+Drivetrain.driveFor(reverse, 15, inches, 200, velocityUnits::rpm);
+ wait(25, msec);
  backClamp1.set(true);
  Drivetrain.driveFor(forward, 30, inches, 400, velocityUnits::rpm);
  FourBar.startRotateFor(100, degrees, 140, velocityUnits::rpm);
